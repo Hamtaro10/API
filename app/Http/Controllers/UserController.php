@@ -48,16 +48,28 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, User $user)
     {
-        //
+        $request->validate([
+            'username' => 'string|max:50|unique:users,username,' . $user->id,
+            'password' => 'nullable|string|min:6',
+            'name' => 'string|max:100'
+        ]);
+
+        if ($request->has('password')) {
+            $request['password'] = Hash::make($request->password);
+        }
+
+        $user->update($request->all());
+        return response()->json($user, 200);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(User $user)
     {
-        //
+        $user->delete();
+        return response()->json(['message' => 'User Deleted Successfully'], 200);
     }
 }
