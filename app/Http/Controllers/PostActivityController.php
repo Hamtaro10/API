@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\PostActivity;
 
 class PostActivityController extends Controller
 {
@@ -11,7 +12,10 @@ class PostActivityController extends Controller
      */
     public function index()
     {
-        //
+        $activities = PostActivity::with('post')->get();
+
+        return response()->json($activites);
+
     }
 
     /**
@@ -19,7 +23,18 @@ class PostActivityController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'post_id'   => 'required|exists:posts,id',
+            'ip'        => 'required|string|max:255',
+            'userAgent' => 'required|string|max:255',
+        ]);
+
+        $postActivity = PostActivity::create($request->only('post_id','ip','userAgent'));
+
+        return response()->json([
+            'message' => 'Post activity created successfully.',
+            'data'    => $postActivity
+        ], 201);
     }
 
     /**
@@ -27,7 +42,9 @@ class PostActivityController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $postActivity->load('post');
+
+        return rersponse()->json($postactivity);
     }
 
     /**
@@ -35,7 +52,11 @@ class PostActivityController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $request->validate([
+            'post_id'   => 'required|exists:posts,id',
+            'ip'        => 'required|string|max:255',
+            'userAgent' => 'required|string|max:255'
+        ]);
     }
 
     /**
@@ -43,6 +64,10 @@ class PostActivityController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $postActivity->delete();
+
+        return response()->json([
+            'message' => 'Post activity deleted successfully.'
+        ]);
     }
 }
